@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeonelB2840 - Scientific Lion</title>
+    <style>
+        body { background-color: #020617; color: white; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .calc-body { background: #111827; padding: 20px; border-radius: 25px; border: 2px solid #38bdf8; box-shadow: 0 0 30px #38bdf8; width: 420px; }
+        #display { width: 100%; height: 60px; background: #000; border: none; color: #38bdf8; text-align: right; padding: 10px; font-size: 1.5rem; margin-bottom: 15px; border-radius: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        button { padding: 12px 5px; font-size: 0.9rem; border: none; border-radius: 8px; cursor: pointer; background: #1e293b; color: #f8fafc; transition: 0.2s; }
+        button:hover { background: #334155; transform: scale(1.05); }
+        .op { color: #38bdf8; font-weight: bold; }
+        .func { color: #818cf8; }
+        .clear { color: #ef4444; }
+        .equal { background: #38bdf8; color: #020617; grid-column: span 1; font-weight: bold; box-shadow: 0 0 10px #38bdf8; }
+    </style>
+</head>
+<body>
+
+<div class="calc-body">
+    <input type="text" id="display" readonly placeholder="0">
+    <div class="grid">
+        <button class="func" onclick="mathFunc('inv')">INV</button>
+        <button class="func" onclick="add('(')">(</button>
+        <button class="func" onclick="add(')')">)</button>
+        <button class="func" onclick="mathFunc('fact')">x!</button>
+        <button class="clear" onclick="clearScreen()">C</button>
+
+        <button class="func" onclick="mathFunc('sin')">sin</button>
+        <button class="func" onclick="mathFunc('cos')">cos</button>
+        <button class="func" onclick="mathFunc('tan')">tan</button>
+        <button class="op" onclick="add('%')">%</button>
+        <button class="op" onclick="add('/')">÷</button>
+
+        <button class="func" onclick="mathFunc('ln')">ln</button>
+        <button class="func" onclick="mathFunc('log')">log</button>
+        <button class="func" onclick="add('**')">xʸ</button>
+        <button class="func" onclick="mathFunc('sqrt')">√</button>
+        <button class="op" onclick="add('*')">×</button>
+
+        <button class="func" onclick="add('Math.PI')">π</button>
+        <button onclick="add('7')">7</button>
+        <button onclick="add('8')">8</button>
+        <button onclick="add('9')">9</button>
+        <button class="op" onclick="add('-')">-</button>
+
+        <button class="func" onclick="add('Math.E')">e</button>
+        <button onclick="add('4')">4</button>
+        <button onclick="add('5')">5</button>
+        <button onclick="add('6')">6</button>
+        <button class="op" onclick="add('+')">+</button>
+
+        <button class="func" onclick="add('**2')">x²</button>
+        <button onclick="add('1')">1</button>
+        <button onclick="add('2')">2</button>
+        <button onclick="add('3')">3</button>
+        <button class="equal" onclick="solve()">=</button>
+
+        <button class="func" onclick="add('00')">00</button>
+        <button onclick="add('0')">0</button>
+        <button onclick="add('.')">.</button>
+        <button class="op" onclick="backspace()">⌫</button>
+        <button class="func" style="color: #fbbf24;">🦁</button>
+    </div>
+</div>
+
+<script>
+    const screen = document.getElementById('display');
+    function add(v) { screen.value += v; }
+    function clearScreen() { screen.value = ''; }
+    function backspace() { screen.value = screen.value.slice(0, -1); }
+
+    function solve() {
+        try {
+            // Efecto Rugido (Beep de sistema como rugido digital)
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sawtooth'; // Sonido más agresivo como rugido
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+
+            screen.value = eval(screen.value.replace('×', '*').replace('÷', '/'));
+        } catch {
+            screen.value = "Error";
+            setTimeout(clearScreen, 1000);
+        }
+    }
+
+    function mathFunc(f) {
+        let v = eval(screen.value) || 0;
+        if(f === 'sin') screen.value = Math.sin(v);
+        if(f === 'cos') screen.value = Math.cos(v);
+        if(f === 'tan') screen.value = Math.tan(v);
+        if(f === 'log') screen.value = Math.log10(v);
+        if(f === 'ln')  screen.value = Math.log(v);
+        if(f === 'sqrt') screen.value = Math.sqrt(v);
+        if(f === 'fact') {
+            let r = 1;
+            for(let i = 2; i <= v; i++) r *= i;
+            screen.value = r;
+        }
+    }
+</script>
+
+</body>
+</html>
