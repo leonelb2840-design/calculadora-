@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlNjaWVudGlmaWMgQ2FsY3VsYXRvciBMaW9uIiwKICAic2hvcnRfbmFtZSI6ICJDYWxjdUxpb24iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzAwMDAwMCIsCiAgInRoZW1lX29sb3IiOiAiIzAwZDRmZiIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImljb24tNTEyLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF0KfQ==">
+<meta name="theme-color" content="#00d4ff">
+
     <title>LeonelB2840 - Scientific Lion</title>
     <style>
         body { background-color: #020617; color: white; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -104,7 +107,10 @@
             screen.value = r;
         }
     }
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
+  }
 </script>
-
 </body>
 </html>
