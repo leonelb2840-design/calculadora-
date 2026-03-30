@@ -1,60 +1,72 @@
-// 1. Nombre de la versión (Cámbialo a v2, v3... cada vez que edites el HTML)
-const cacheName = 'Scientific-Lion-v1.1';
+// 1. Identificador de la versión (Subimos a 1.4 por el cambio de icono)
+const CACHE_NAME = 'Scientific-Calculator-Lion-v1.4';
 
-// 2. Lista de archivos a proteger (Asegúrate de que existan en tu GitHub)
-const assets = [
+// 2. Archivos Vitales (Corregido a icon-app.png)
+const INITIAL_ASSETS = [
   './',
   './index.html',
-  './icon-512.png'
+  './icon-app.png' 
 ];
 
-// --- EVENTO DE INSTALACIÓN ---
-// Se ejecuta la primera vez que alguien entra. Guarda todo en el teléfono.
+// --- FASE DE INSTALACIÓN ---
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(cacheName).then(cache => {
-      console.log('🦁 CalcuLion: Guardando archivos en memoria...');
-      return cache.addAll(assets);
-    }).then(() => self.skipWaiting()) // Fuerza a que la nueva versión se active YA
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('🦁 [CalcuLion]: Núcleo del sistema instalado.');
+      // Usamos return para asegurar que todo se guarde antes de terminar
+      return cache.addAll(INITIAL_ASSETS);
+    }).then(() => self.skipWaiting())
   );
 });
 
-// --- EVENTO DE ACTIVACIÓN ---
-// Borra versiones viejas automáticamente para no llenar el espacio del TECNO.
+// --- FASE DE ACTIVACIÓN ---
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys.filter(key => key !== cacheName)
+        keys.filter(key => key !== CACHE_NAME)
             .map(key => {
-              console.log('🦁 CalcuLion: Limpiando caché viejo...', key);
+              console.log('🦁 [CalcuLion]: Limpiando caché antiguo:', key);
               return caches.delete(key);
             })
       );
+    }).then(() => {
+      console.log('🦁 [CalcuLion]: Sistema en línea y listo para rugir.');
+      return self.clients.claim();
     })
   );
 });
 
-// --- EVENTO DE PETICIÓN (FETCH) ---
-// La magia: Si hay internet, actualiza el archivo. Si no hay, usa el del teléfono.
+// --- ESTRATEGIA DE RED: NETWORK FIRST CON AUTO-RECUPERACIÓN ---
 self.addEventListener('fetch', event => {
+  // Solo procesamos peticiones seguras de tipo GET
+  if (event.request.method !== 'GET') return;
+  
+  // Evitamos cachear scripts de extensiones o cosas externas que no sean tuyas
+  if (!(event.request.url.indexOf('http') === 0)) return;
+
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      // Retorna lo que hay en caché inmediatamente
-      const networkFetch = fetch(event.request).then(networkResponse => {
-        // Si la red responde, actualizamos el caché en segundo plano
+    fetch(event.request)
+      .then(networkResponse => {
+        // Si hay internet, guardamos la copia más fresca
         if (networkResponse && networkResponse.status === 200) {
-          caches.open(cacheName).then(cache => {
-            cache.put(event.request, networkResponse.clone());
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Si no hay internet y no está en caché (error total), aquí podrías poner una página de error
-        console.log('🦁 CalcuLion: Modo Offline Activo.');
-      });
-
-      return cachedResponse || networkFetch;
-    })
+      })
+      .catch(() => {
+        // MODO OFFLINE: Si falla la red, buscamos en el TECNO
+        return caches.match(event.request).then(cachedResponse => {
+          if (cachedResponse) return cachedResponse;
+          
+          // Si el usuario navega a una ruta desconocida sin internet, lo mandamos al inicio
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+        });
+      })
   );
 });
